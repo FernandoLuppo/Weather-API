@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/common.sh"
+
+npx eslint src/**/*.ts
+
+npx --no-install
+
+tsc --project tsconfig.js
