@@ -1,8 +1,10 @@
 import sequelize, { Model } from "sequelize"
 import db from "."
+import type { UUID } from "crypto"
+import { Token } from "./Token"
 
 export class User extends Model {
-  declare id: string
+  declare id: UUID
   declare name: string
   declare email: string
   declare password: string
@@ -11,7 +13,7 @@ export class User extends Model {
 User.init(
   {
     id: {
-      type: sequelize.CHAR(36),
+      type: sequelize.UUIDV4,
       autoIncrement: false,
       allowNull: false,
       primaryKey: true
@@ -35,3 +37,7 @@ User.init(
     tableName: "user"
   }
 )
+
+User.hasOne(Token, {
+  foreignKey: "id"
+})

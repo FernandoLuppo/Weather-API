@@ -5,7 +5,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("token", {
       id: {
-        type: Sequelize.CHAR(36),
+        type: Sequelize.UUIDV4,
         autoIncrement: false,
         allowNull: false,
         primaryKey: true
@@ -15,7 +15,7 @@ module.exports = {
         allowNull: false
       },
       userToken: {
-        type: Sequelize.CHAR(36),
+        type: Sequelize.UUIDV4,
         allowNull: false,
         references: {
           model: "user",

@@ -1,16 +1,18 @@
 import sequelize, { Model } from "sequelize"
 import db from "."
+import type { UUID } from "crypto"
+import { User } from "./User"
 
-export class User extends Model {
-  declare id: string
+export class Token extends Model {
+  declare id: UUID
   declare token: string
   declare userToken: string
 }
 
-User.init(
+Token.init(
   {
     id: {
-      type: sequelize.CHAR(36),
+      type: sequelize.UUIDV4,
       autoIncrement: false,
       allowNull: false,
       primaryKey: true
@@ -30,3 +32,8 @@ User.init(
     underscored: true
   }
 )
+
+Token.belongsTo(User, {
+  foreignKey: "userToken",
+  as: "user"
+})
