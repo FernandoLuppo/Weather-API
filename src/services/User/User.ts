@@ -4,6 +4,7 @@ import type { IResult } from '../../types'
 import { loginAuthenticateSchema, registerAuthenticateSchema } from '../../middleware'
 import { User } from "../../database/models/User"
 import { v4 as uuidv4 } from 'uuid';
+import { handleCatchErrors } from '../../utils'
 
 export class UserService {
   public constructor(private readonly _req: Request) {}
@@ -28,15 +29,11 @@ export class UserService {
 
     try {
       await User.create({id, name, email, password})
-
       result.data = {message: 'User create with success!'}
+
       return result
     } catch (error) {
-      const err = error as Error
-      result.error = [err.message]
-      result.isError = true
-
-      return result
+      return handleCatchErrors(error)
     }
 
   }
