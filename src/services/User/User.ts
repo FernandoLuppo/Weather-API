@@ -1,9 +1,12 @@
 import type { Request } from 'express'
-import type { UserValidation } from './UserValidation'
+import type * as yup from 'yup'
 import type { IResult } from '../../types'
+import { loginAuthenticateSchema, registerAuthenticateSchema } from '../../middleware'
+import { User } from "../../database/models/User"
+import { v4 as uuidv4 } from 'uuid';
 
-export class User {
-  public constructor(private readonly _request: Request) {}
+export class UserService {
+  public constructor(private readonly _req: Request) {}
 
   public getInfos(): void {}
 
@@ -11,17 +14,11 @@ export class User {
 
   public deleteUser(): void {}
 
-  public register(): void {}
-
-  public login(): void {}
-
-  private async _registerValidation(
-    userValidation: UserValidation
-  ): Promise<IResult> {
-    const result: IResult = { error: [''], isError: false, data: '' }
-
-    const { data, error, isError } =
-      await userValidation.registerDataValidation()
+  public async register(): Promise<IResult> {
+    const result: IResult = { error: [''], isError: false, data: {} }
+    const {name, email, password} = this._req.body
+    const {error, isError} = await this._registerValidation()
+    const id = uuidv4()
 
     if (isError) {
       result.error = error
@@ -29,8 +26,68 @@ export class User {
       return result
     }
 
-    return result
+    try {
+      await User.create({id, name, email, password})
+
+      result.data = {message: 'User create with success!'}
+      return result
+    } catch (error) {
+      const err = error as Error
+      result.error = [err.message]
+      result.isError = true
+
+      return result
+    }
+
   }
 
-  private _loginValidation(): void {}
+  public login(): void {
+
+  }
+
+  private async _registerValidation(): Promise<IResult> {
+    const result: IResult = { error: [''], isError: false, data: '' }
+
+    try {
+      await registerAuthenticateSchema.validate(this._req.body, {
+        abortEarly: false
+      })
+
+      return result
+    } catch (err) {
+      const errors: string[] = []
+
+      ;(err as yup.ValidationError).errors.forEach(error => {
+        errors.push(error)
+      })
+
+      result.isError = true
+      result.error = errors
+
+      return result
+  }
+}
+
+  private async _loginValidation(): Promise<IResult> {
+    const result: IResult = { error: [''], isError: false, data: '' }
+
+    try {
+      await loginAuthenticateSchema.validate(this._req.body, {
+        abortEarly: false
+      })
+
+      return result
+    } catch (err) {
+      const errors: string[] = []
+
+      ;(err as yup.ValidationError).errors.forEach(error => {
+        errors.push(error)
+      })
+
+      result.isError = true
+      result.error = errors
+
+      return result
+    }
+  }
 }
