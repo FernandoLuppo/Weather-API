@@ -30,7 +30,11 @@ User.init(
     password: {
       type: sequelize.STRING,
       allowNull: false
-    }
+    },
+    profileImage: {
+      type: sequelize.STRING,
+      defaultValue: "assets/icons/user-icon.svg",
+    },
   },
   {
     sequelize: db,
