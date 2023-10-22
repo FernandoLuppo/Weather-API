@@ -5,7 +5,8 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable("user", {
       id: {
-        type: Sequelize.UUIDV4,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         autoIncrement: false,
         allowNull: false,
         primaryKey: true
@@ -22,7 +23,11 @@ module.exports = {
       password: {
         type: Sequelize.STRING,
         allowNull: false
-      }
+      },
+      profileImage: {
+        type: Sequelize.STRING,
+        defaultValue: "assets/icons/user-icon.svg",
+      },
     })
   },
 
