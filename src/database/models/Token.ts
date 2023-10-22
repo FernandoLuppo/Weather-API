@@ -12,7 +12,7 @@ export class Token extends Model {
 Token.init(
   {
     id: {
-      type: sequelize.UUIDV4,
+      type: sequelize.UUID,
       autoIncrement: false,
       allowNull: false,
       primaryKey: true
