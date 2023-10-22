@@ -1,8 +1,7 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/common.sh"
+. "$(dirname -- "$0")/_/husky.sh"
 
 npx eslint src/**/*.ts
 
 npx --no-install
 
-tsc --project tsconfig.js
