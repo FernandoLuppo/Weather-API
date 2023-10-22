@@ -13,7 +13,7 @@ export class User extends Model {
 User.init(
   {
     id: {
-      type: sequelize.UUIDV4,
+      type: sequelize.UUID,
       autoIncrement: false,
       allowNull: false,
       primaryKey: true
