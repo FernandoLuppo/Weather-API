@@ -1,8 +1,8 @@
-import express from 'express'
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
+import express from "express"
+import cors from "cors"
+import cookieParser from "cookie-parser"
 
-import * as dotenv from 'dotenv'
+import * as dotenv from "dotenv"
 dotenv.config()
 
 const app = express()

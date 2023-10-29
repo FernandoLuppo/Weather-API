@@ -1,9 +1,9 @@
 import {
   loginAuthenticateSchema,
   registerAuthenticateSchema
-} from './authenticateSchema'
-import type { NextFunction, Request, Response } from 'express'
-import type * as yup from 'yup'
+} from "./authenticateSchema"
+import type { NextFunction, Request, Response } from "express"
+import type * as yup from "yup"
 
 export class UserAuthenticate {
   public constructor(
@@ -13,7 +13,7 @@ export class UserAuthenticate {
   ) {}
 
   public async register(): Promise<void> {
-    const result = { error: [''], isError: false, data: '' }
+    const result = { error: [""], isError: false, content: "" }
 
     try {
       await registerAuthenticateSchema.validate(this._request.body, {
@@ -35,7 +35,7 @@ export class UserAuthenticate {
   }
 
   public async login(): Promise<void> {
-    const result = { error: [''], isError: false, data: '' }
+    const result = { error: [""], isError: false, content: "" }
 
     try {
       await loginAuthenticateSchema.validate(this._request.body, {

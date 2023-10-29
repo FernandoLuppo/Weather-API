@@ -1,5 +1,5 @@
 export interface IResult {
-  error: '' | string[]
+  error: string[]
   isError: boolean
-  data: any
+  content: any
 }
