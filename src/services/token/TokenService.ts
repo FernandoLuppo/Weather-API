@@ -14,7 +14,7 @@ declare global {
 }
 
 export class TokenService {
-  public createToken(id: string): IResult {
+  public createToken(id: string, date: string): IResult {
     const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
 
@@ -26,7 +26,7 @@ export class TokenService {
 
     const token = sign({}, TOKEN_SECRET, {
       subject: id,
-      expiresIn: "60m"
+      expiresIn: date
     })
 
     result.content = token
