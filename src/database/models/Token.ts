@@ -24,6 +24,10 @@ Token.init(
     userToken: {
       type: sequelize.STRING,
       allowNull: false
+    },
+    expireDat: {
+      type: sequelize.DATE,
+      allowNull: false
     }
   },
   {
