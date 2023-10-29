@@ -13,7 +13,7 @@ export class UserAuthenticate {
   ) {}
 
   public async register(): Promise<void> {
-    const result = { error: [''], isError: false, data: '' }
+    const result = { error: [''], isError: false, content: '' }
 
     try {
       await registerAuthenticateSchema.validate(this._request.body, {
@@ -35,7 +35,7 @@ export class UserAuthenticate {
   }
 
   public async login(): Promise<void> {
-    const result = { error: [''], isError: false, data: '' }
+    const result = { error: [''], isError: false, content: '' }
 
     try {
       await loginAuthenticateSchema.validate(this._request.body, {

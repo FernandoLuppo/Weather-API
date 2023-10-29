@@ -16,7 +16,7 @@ export class UserService {
   public deleteUser(): void {}
 
   public async register(): Promise<IResult> {
-    const result: IResult = { error: [''], isError: false, data: {} }
+    const result: IResult = { error: [''], isError: false, content: {} }
     const {name, email, password} = this._req.body
     const {error, isError} = await this._registerValidation()
     const id = uuidv4()
@@ -29,7 +29,7 @@ export class UserService {
 
     try {
       await User.create({id, name, email, password})
-      result.data = {message: 'User create with success!'}
+      result.content = {message: 'User create with success!'}
 
       return result
     } catch (error) {
@@ -43,7 +43,7 @@ export class UserService {
   }
 
   private async _registerValidation(): Promise<IResult> {
-    const result: IResult = { error: [''], isError: false, data: '' }
+    const result: IResult = { error: [''], isError: false, content: '' }
 
     try {
       await registerAuthenticateSchema.validate(this._req.body, {
@@ -66,7 +66,7 @@ export class UserService {
 }
 
   private async _loginValidation(): Promise<IResult> {
-    const result: IResult = { error: [''], isError: false, data: '' }
+    const result: IResult = { error: [''], isError: false, content: '' }
 
     try {
       await loginAuthenticateSchema.validate(this._req.body, {
