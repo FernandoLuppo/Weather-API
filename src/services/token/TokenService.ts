@@ -1,5 +1,5 @@
-import type { Request } from "express";
-import type { IResult } from "../../types";
+import type { Request } from "express"
+import type { IResult } from "../../types"
 import { sign, verify } from "jsonwebtoken"
 
 declare global {
@@ -15,7 +15,7 @@ declare global {
 
 export class TokenService {
   public createToken(id: string): IResult {
-    const result: IResult = {error: [], isError: false, content: {}}
+    const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
 
     if (TOKEN_SECRET === undefined) {
@@ -34,25 +34,25 @@ export class TokenService {
   }
 
   public validateToken(name: string, req: Request): IResult {
-    const result: IResult = {error: [], isError: false, content: {}}
+    const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
     let token = ""
 
-    switch(name) {
-      case 'accessToken':
+    switch (name) {
+      case "accessToken":
         token = req.cookies.accessToken
-      break
-      case 'refreshToken':
+        break
+      case "refreshToken":
         token = req.cookies.refreshToken
-      break
-      case 'emailToken':
+        break
+      case "emailToken":
         token = req.cookies.emailToken
-      break
+        break
       default:
-        token = ''
+        token = ""
     }
 
-    if (token !==  "" && TOKEN_SECRET !== undefined) {
+    if (token !== "" && TOKEN_SECRET !== undefined) {
       const decodedToken = verify(token, TOKEN_SECRET) as {
         sub?: string
       }
@@ -67,7 +67,7 @@ export class TokenService {
     }
 
     result.isError = true
-    result.error = ['Invalid token.']
+    result.error = ["Invalid token."]
     return result
   }
 }

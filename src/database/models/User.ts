@@ -33,8 +33,8 @@ User.init(
     },
     profileImage: {
       type: sequelize.STRING,
-      defaultValue: "assets/icons/user-icon.svg",
-    },
+      defaultValue: "assets/icons/user-icon.svg"
+    }
   },
   {
     sequelize: db,

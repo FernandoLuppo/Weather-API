@@ -26,8 +26,8 @@ module.exports = {
       },
       profileImage: {
         type: Sequelize.STRING,
-        defaultValue: "assets/icons/user-icon.svg",
-      },
+        defaultValue: "assets/icons/user-icon.svg"
+      }
     })
   },
 
