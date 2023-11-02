@@ -9,7 +9,7 @@ import { User } from "../../database/models/User"
 import { Token } from "../../database/models/Token"
 import { v4 as uuidv4 } from "uuid"
 import { handleCatchErrors } from "../../utils"
-import type { TokenService } from "../Token/TokenService"
+import type { TokenService } from "../token/TokenService"
 import dayjs from "dayjs"
 import { EncryptPasswordService } from "../EncryptPassword/EncryptPasswordService"
 
