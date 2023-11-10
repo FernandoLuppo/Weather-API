@@ -42,9 +42,16 @@ export class UserService {
       result.isError = newPassword.isError
       return result
     }
-
+    console.log(id, name, email, newPassword.content)
+    User.create({
+      id,
+      name,
+      email,
+      password: newPassword.content
+    })
+      .then(data => console.log(data))
+      .catch(error => console.log("error: ", error))
     try {
-      await User.create({ id, name, email, password: newPassword.content })
       result.content = { message: "User create with success!" }
 
       return result

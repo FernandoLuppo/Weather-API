@@ -1,13 +1,14 @@
-import sequelize, { Model } from "sequelize"
+import sequelize, { type CreationOptional, Model } from "sequelize"
 import db from "."
 import type { UUID } from "crypto"
-import { Token } from "./Token"
 
 export class User extends Model {
   declare id: UUID
   declare name: string
   declare email: string
   declare password: string
+  declare createdAt: CreationOptional<Date>
+  declare updatedAt: CreationOptional<Date>
 }
 
 User.init(
@@ -41,7 +42,3 @@ User.init(
     tableName: "user"
   }
 )
-
-User.hasOne(Token, {
-  foreignKey: "id"
-})
