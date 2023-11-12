@@ -6,21 +6,19 @@ import type { NextFunction, Request, Response } from "express"
 import type * as yup from "yup"
 
 export class UserAuthenticate {
-  public constructor(
-    private readonly _request: Request,
-    private readonly _response: Response,
-    private readonly _next: NextFunction
-  ) {}
-
-  public async register(): Promise<void> {
+  public async register(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const result = { error: [""], isError: false, content: "" }
 
     try {
-      await registerAuthenticateSchema.validate(this._request.body, {
+      await registerAuthenticateSchema.validate(req.body, {
         abortEarly: false
       })
 
-      this._next()
+      next()
     } catch (err) {
       const errors: string[] = []
 
@@ -30,19 +28,23 @@ export class UserAuthenticate {
 
       result.isError = true
       result.error = errors
-      this._response.status(401).send(result)
+      res.status(401).send(result)
     }
   }
 
-  public async login(): Promise<void> {
+  public async login(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     const result = { error: [""], isError: false, content: "" }
 
     try {
-      await loginAuthenticateSchema.validate(this._request.body, {
+      await loginAuthenticateSchema.validate(req.body, {
         abortEarly: false
       })
 
-      this._next()
+      next()
     } catch (err) {
       const errors: string[] = []
 
@@ -52,7 +54,7 @@ export class UserAuthenticate {
 
       result.isError = true
       result.error = errors
-      this._response.status(401).send(result)
+      res.status(401).send(result)
     }
   }
 }

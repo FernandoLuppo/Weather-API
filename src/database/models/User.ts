@@ -1,13 +1,14 @@
-import sequelize, { Model } from "sequelize"
+import sequelize, { type CreationOptional, Model } from "sequelize"
 import db from "."
 import type { UUID } from "crypto"
-import { Token } from "./Token"
 
 export class User extends Model {
   declare id: UUID
   declare name: string
   declare email: string
   declare password: string
+  declare createdAt: CreationOptional<Date>
+  declare updatedAt: CreationOptional<Date>
 }
 
 User.init(
@@ -34,14 +35,20 @@ User.init(
     profileImage: {
       type: sequelize.STRING,
       defaultValue: "assets/icons/user-icon.svg"
+    },
+    createdAt: {
+      type: sequelize.DATE,
+      allowNull: false
+    },
+    updatedAt: {
+      type: sequelize.DATE,
+      allowNull: false
     }
   },
   {
     sequelize: db,
-    tableName: "user"
+    tableName: "user",
+    underscored: true,
+    timestamps: true
   }
 )
-
-User.hasOne(Token, {
-  foreignKey: "id"
-})

@@ -16,7 +16,21 @@ import { EncryptPasswordService } from "../EncryptPassword/EncryptPasswordServic
 export class UserService {
   public constructor(private readonly _req: Request) {}
 
-  public getInfos(): void {}
+  public async getInfos(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: {} }
+    const { id } = this._req.user
+
+    try {
+      const user = await User.findOne({ where: { id } })
+
+      console.log("user: ", user)
+      result.content = { name: user?.name, email: user?.email }
+
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
 
   public updateInfos(): void {}
 
@@ -44,8 +58,13 @@ export class UserService {
     }
 
     try {
-      await User.create({ id, name, email, password: newPassword.content })
-      result.content = { message: "User create with success!" }
+      await User.create({
+        id,
+        name,
+        email,
+        password: newPassword.content
+      })
+      result.content = "User create with success!"
 
       return result
     } catch (error) {
@@ -83,6 +102,12 @@ export class UserService {
     } catch (error) {
       return handleCatchErrors(error)
     }
+  }
+
+  private async _getInfosValidation(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: "" }
+
+    return result
   }
 
   private async _registerValidation(): Promise<IResult> {
