@@ -3,7 +3,8 @@ import type * as yup from "yup"
 import type { IResult } from "../../types"
 import {
   loginAuthenticateSchema,
-  registerAuthenticateSchema
+  registerAuthenticateSchema,
+  updateInfosAuthenticateSchema
 } from "../../middleware"
 import { User } from "../../database/models/User"
 import { Token } from "../../database/models/Token"
@@ -13,33 +14,98 @@ import type { TokenService } from "../token/TokenService"
 import dayjs from "dayjs"
 import { EncryptPasswordService } from "../EncryptPassword/EncryptPasswordService"
 
+//  Fazer uma funcao de handle errors para os erros relacionado a validacao do yup
+//  Result.content se for uma mensagem tem que estar em um objeto = { message: "" } procurar no resto do codigo
+
 export class UserService {
   public constructor(private readonly _req: Request) {}
 
   public async getInfos(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
-    const { id } = this._req.user
+    const id = this._req.user?.id
 
     try {
       const user = await User.findOne({ where: { id } })
 
-      console.log("user: ", user)
-      result.content = { name: user?.name, email: user?.email }
+      console.log("UserService -> user: ", user)
+      if (user !== null) {
+        result.content = { name: user?.name, email: user?.email }
+        return result
+      }
 
+      result.error = ["User not found."]
+      result.isError = true
       return result
     } catch (error) {
       return handleCatchErrors(error)
     }
   }
 
-  public updateInfos(): void {}
+  public async updateInfos(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: {} }
+    const { content, error, isError } = await this._updateInfosValidation()
+    const id = this._req.user?.id
+    const items = [
+      { value: content.name, name: "name" },
+      { value: content.email, name: "email" },
+      { value: content.profileImage, name: "profileImage" }
+    ]
 
-  public deleteUser(): void {}
+    if (isError) {
+      result.error = error
+      result.isError = isError
+      return result
+    }
+
+    try {
+      const user = await User.findOne({ where: { id } })
+      // let user = await User.findOne({ where: { id } })
+      if (user !== null) {
+        items.forEach(async item => {
+          if (item.value !== "") await user.update(item.value)
+        })
+
+        // items.forEach(async item => {
+        //   if (item.value !== "") {
+        //     user = item.value
+        //     await user?.save()
+        //   }
+        // })
+
+        result.content = {
+          name: user.name,
+          email: user.email
+          // profileImage: user.profileImage
+        }
+        return result
+      }
+
+      result.isError = true
+      result.error = ["User not found."]
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
+
+  public async deleteUser(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: {} }
+    const id = this._req.user?.id
+
+    try {
+      const user = await User.findOne({ where: { id } })
+      await user?.destroy()
+
+      result.content = { message: "User deleted." }
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
 
   public async register(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
-    const { name, email, password } = this._req.body
-    const { error, isError } = await this._registerValidation()
+    const { content, error, isError } = await this._registerValidation()
     const id = uuidv4()
 
     if (isError) {
@@ -48,7 +114,7 @@ export class UserService {
       return result
     }
 
-    const encryptPassword = new EncryptPasswordService(password)
+    const encryptPassword = new EncryptPasswordService(content.password)
     const newPassword = encryptPassword.encrypt()
 
     if (newPassword.isError) {
@@ -60,11 +126,11 @@ export class UserService {
     try {
       await User.create({
         id,
-        name,
-        email,
+        name: content.name,
+        email: content.email,
         password: newPassword.content
       })
-      result.content = "User create with success!"
+      result.content = { message: "User create with success!" }
 
       return result
     } catch (error) {
@@ -104,10 +170,19 @@ export class UserService {
     }
   }
 
-  private async _getInfosValidation(): Promise<IResult> {
+  private async _updateInfosValidation(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: "" }
 
-    return result
+    try {
+      await updateInfosAuthenticateSchema.validate(this._req.body, {
+        abortEarly: false
+      })
+
+      result.content = this._req.body
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
   }
 
   private async _registerValidation(): Promise<IResult> {
@@ -118,6 +193,7 @@ export class UserService {
         abortEarly: false
       })
 
+      result.content = this._req.body
       return result
     } catch (err) {
       const errors: string[] = []
@@ -168,7 +244,6 @@ export class UserService {
 
       result.isError = true
       result.error = errors
-
       return result
     }
   }
