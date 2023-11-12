@@ -5,7 +5,7 @@
   "author": "Fernando Luppo <fernandoluppo2@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "ts-node-dev src/server.ts",
+    "dev": "ts-node-dev src/server.ts",
     "commit": "cz",
     "prepare": "husky install",
     "build": "tsup src"
