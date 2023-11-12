@@ -35,10 +35,20 @@ User.init(
     profileImage: {
       type: sequelize.STRING,
       defaultValue: "assets/icons/user-icon.svg"
+    },
+    createdAt: {
+      type: sequelize.DATE,
+      allowNull: false
+    },
+    updatedAt: {
+      type: sequelize.DATE,
+      allowNull: false
     }
   },
   {
     sequelize: db,
-    tableName: "user"
+    tableName: "user",
+    underscored: true,
+    timestamps: true
   }
 )

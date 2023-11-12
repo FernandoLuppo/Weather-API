@@ -1,4 +1,4 @@
-import { type CreationOptional, DataTypes, Model } from "sequelize"
+import sequelize, { type CreationOptional, Model } from "sequelize"
 import db from "."
 import type { UUID } from "crypto"
 import { User } from "./User"
@@ -14,27 +14,36 @@ export class Token extends Model {
 Token.init(
   {
     id: {
-      type: DataTypes.UUID,
+      type: sequelize.UUID,
       allowNull: false,
       primaryKey: true
     },
     token: {
-      type: DataTypes.STRING,
+      type: sequelize.STRING,
       allowNull: false
     },
     userToken: {
-      type: DataTypes.STRING,
+      type: sequelize.STRING,
       allowNull: false
     },
     expireDate: {
-      type: DataTypes.DATE,
+      type: sequelize.DATE,
+      allowNull: false
+    },
+    createdAt: {
+      type: sequelize.DATE,
+      allowNull: false
+    },
+    updatedAt: {
+      type: sequelize.DATE,
       allowNull: false
     }
   },
   {
     sequelize: db,
     tableName: "Token",
-    underscored: true
+    underscored: true,
+    timestamps: true
   }
 )
 
