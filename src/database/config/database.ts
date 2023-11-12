@@ -20,9 +20,8 @@ const config: Options = {
   host: DB_HOST,
   dialect: "mysql",
   define: {
-    timestamps: true
-  },
-  logging: true
+    timestamps: false
+  }
 }
 
 export = config
