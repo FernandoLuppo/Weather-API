@@ -1,24 +1,52 @@
 import type { NextFunction, Request, Response } from "express"
-import type { TokenService } from "../../services/token/TokenService"
-import type { IResult } from "../../types"
+import { TokenService } from "../../services/token/TokenService"
 
 export class TokenAuthenticate {
-  public authenticate(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-    tokenService: TokenService
-  ): void {
-    const result: IResult = { error: [""], isError: false, content: {} }
-    const token = req.cookies
-    console.log("TokenAuthenticate -> token: ", token)
-    const { error, isError } = tokenService.validateToken(`${token}`, req)
+  public accessToken(req: Request, res: Response, next: NextFunction): void {
+    const { accessToken } = req.cookies
+    const tokenService = new TokenService()
+
+    const { content, error, isError } = tokenService.validateToken(
+      accessToken.content,
+      req
+    )
 
     if (isError) {
-      result.error = error
-      result.isError = isError
-      result.content = "Invalid Token"
-      res.status(401).send(result)
+      res.status(401).send({ content, error, isError })
+      return
+    }
+
+    next()
+  }
+
+  public refreshToken(req: Request, res: Response, next: NextFunction): void {
+    const { refreshToken } = req.cookies
+    const tokenService = new TokenService()
+
+    const { content, error, isError } = tokenService.validateToken(
+      refreshToken.content,
+      req
+    )
+
+    if (isError) {
+      res.status(401).send({ content, error, isError })
+      return
+    }
+
+    next()
+  }
+
+  public emailToken(req: Request, res: Response, next: NextFunction): void {
+    const { emailToken } = req.cookies
+    const tokenService = new TokenService()
+
+    const { content, error, isError } = tokenService.validateToken(
+      emailToken.content,
+      req
+    )
+
+    if (isError) {
+      res.status(401).send({ content, error, isError })
       return
     }
 

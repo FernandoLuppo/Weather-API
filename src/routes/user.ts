@@ -1,19 +1,59 @@
 import { Router } from "express"
 import type { Request, Response } from "express"
-import { UserAuthenticate } from "../middleware"
-import { UserService } from "../services/user/UserService"
+import { TokenAuthenticate, UserAuthenticate } from "../middleware"
+import { TokenService, UserService } from "../services"
 import { UserController } from "../controllers/UserController"
 
 const userRouter = Router()
 
 const userAuthenticate = new UserAuthenticate()
+const tokenAuthenticate = new TokenAuthenticate()
+
+userRouter.get(
+  "/get-infos",
+  tokenAuthenticate.accessToken,
+  async (req: Request, res: Response) => {
+    const userService = new UserService(req)
+    return await new UserController(res, userService).getInfos()
+  }
+)
+
+//  Ver a diferenca de patch e put
+userRouter.patch(
+  "/update-infos",
+  tokenAuthenticate.accessToken,
+  userAuthenticate.updateInfos,
+  async (req: Request, res: Response) => {
+    const userService = new UserService(req)
+    return await new UserController(res, userService).updateInfos()
+  }
+)
 
 userRouter.post(
   "/register",
   userAuthenticate.register,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).createUser()
+    return await new UserController(res, userService).register()
+  }
+)
+
+userRouter.post(
+  "/login",
+  userAuthenticate.login,
+  async (req: Request, res: Response) => {
+    const userService = new UserService(req)
+    const tokenService = new TokenService()
+    return await new UserController(res, userService).login(tokenService)
+  }
+)
+
+userRouter.delete(
+  "/delete",
+  tokenAuthenticate.accessToken,
+  async (req: Request, res: Response) => {
+    const userService = new UserService(req)
+    return await new UserController(res, userService).deleteUser()
   }
 )
 

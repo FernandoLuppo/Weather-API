@@ -23,8 +23,13 @@ Token.init(
       allowNull: false
     },
     userToken: {
-      type: sequelize.STRING,
-      allowNull: false
+      type: sequelize.UUID,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: "Users",
+        key: "id"
+      }
     },
     expireDate: {
       type: sequelize.DATE,
@@ -47,12 +52,12 @@ Token.init(
   }
 )
 
-User.belongsTo(Token, {
-  foreignKey: "userToken",
+User.hasOne(Token, {
+  foreignKey: "user_token",
   as: "token"
 })
 
 Token.belongsTo(User, {
-  foreignKey: "userToken",
+  foreignKey: "user_token",
   as: "user"
 })
