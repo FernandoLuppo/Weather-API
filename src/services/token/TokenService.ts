@@ -33,24 +33,9 @@ export class TokenService {
     return result
   }
 
-  public validateToken(name: string, req: Request): IResult {
+  public validateToken(token: string, req: Request): IResult {
     const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
-    let token = ""
-
-    switch (name) {
-      case "accessToken":
-        token = req.cookies.accessToken
-        break
-      case "refreshToken":
-        token = req.cookies.refreshToken
-        break
-      case "emailToken":
-        token = req.cookies.emailToken
-        break
-      default:
-        token = ""
-    }
 
     if (token !== "" && TOKEN_SECRET !== undefined) {
       const decodedToken = verify(token, TOKEN_SECRET) as {

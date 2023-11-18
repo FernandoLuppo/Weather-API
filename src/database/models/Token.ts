@@ -1,4 +1,4 @@
-import sequelize, { Model } from "sequelize"
+import sequelize, { type CreationOptional, Model } from "sequelize"
 import db from "."
 import type { UUID } from "crypto"
 import { User } from "./User"
@@ -7,13 +7,14 @@ export class Token extends Model {
   declare id: UUID
   declare token: string
   declare userToken: string
+  declare createdAt: CreationOptional<Date>
+  declare updatedAt: CreationOptional<Date>
 }
 
 Token.init(
   {
     id: {
       type: sequelize.UUID,
-      autoIncrement: false,
       allowNull: false,
       primaryKey: true
     },
@@ -22,10 +23,23 @@ Token.init(
       allowNull: false
     },
     userToken: {
-      type: sequelize.STRING,
+      type: sequelize.UUID,
+      allowNull: false,
+      primaryKey: true,
+      references: {
+        model: "Users",
+        key: "id"
+      }
+    },
+    expireDate: {
+      type: sequelize.DATE,
       allowNull: false
     },
-    expireDat: {
+    createdAt: {
+      type: sequelize.DATE,
+      allowNull: false
+    },
+    updatedAt: {
       type: sequelize.DATE,
       allowNull: false
     }
@@ -33,11 +47,17 @@ Token.init(
   {
     sequelize: db,
     tableName: "Token",
-    underscored: true
+    underscored: true,
+    timestamps: true
   }
 )
 
+User.hasOne(Token, {
+  foreignKey: "user_token",
+  as: "token"
+})
+
 Token.belongsTo(User, {
-  foreignKey: "userToken",
+  foreignKey: "user_token",
   as: "user"
 })

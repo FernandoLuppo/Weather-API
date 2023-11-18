@@ -18,7 +18,10 @@ const config: Options = {
   password: DB_PASSWORD,
   database: DB_NAME,
   host: DB_HOST,
-  dialect: "mysql"
+  dialect: "mysql",
+  define: {
+    timestamps: false
+  }
 }
 
 export = config

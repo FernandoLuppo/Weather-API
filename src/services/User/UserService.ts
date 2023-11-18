@@ -3,29 +3,82 @@ import type * as yup from "yup"
 import type { IResult } from "../../types"
 import {
   loginAuthenticateSchema,
-  registerAuthenticateSchema
+  registerAuthenticateSchema,
+  updateInfosAuthenticateSchema
 } from "../../middleware"
 import { User } from "../../database/models/User"
 import { Token } from "../../database/models/Token"
 import { v4 as uuidv4 } from "uuid"
-import { handleCatchErrors } from "../../utils"
-import type { TokenService } from "../Token/TokenService"
+import { handleCatchErrors, handleYupErrors } from "../../utils"
+import type { TokenService } from "../"
 import dayjs from "dayjs"
-import { EncryptPasswordService } from "../EncryptPassword/EncryptPasswordService"
+import { EncryptPasswordService } from "../"
 
 export class UserService {
   public constructor(private readonly _req: Request) {}
 
-  public getInfos(): void {}
+  public async getInfos(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: {} }
+    const id = this._req.user?.id
 
-  public updateInfos(): void {}
+    try {
+      const user = await User.findOne({ where: { id } })
 
-  public deleteUser(): void {}
+      if (user !== null) {
+        result.content = {
+          name: user?.name,
+          email: user?.email,
+          userProfile: user?.dataValues.profileImage
+        }
+        return result
+      }
+
+      result.error = ["User not found."]
+      result.isError = true
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
+
+  public async updateInfos(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: {} }
+    const { content, error, isError } = await this._updateInfosValidation()
+    const id = this._req.user?.id
+
+    if (isError) {
+      result.error = error
+      result.isError = isError
+      return result
+    }
+
+    try {
+      const user = await User.findOne({ where: { id } })
+      if (user !== null) {
+        user.name = content.name
+        user.email = content.email
+        user.dataValues.profileImage = content.profileImage
+        await user.save()
+
+        result.content = {
+          name: user?.name,
+          email: user?.email,
+          profileImage: user.dataValues.profileImage
+        }
+        return result
+      }
+
+      result.isError = true
+      result.error = ["User not found."]
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
 
   public async register(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
-    const { name, email, password } = this._req.body
-    const { error, isError } = await this._registerValidation()
+    const { content, error, isError } = await this._registerValidation()
     const id = uuidv4()
 
     if (isError) {
@@ -34,7 +87,7 @@ export class UserService {
       return result
     }
 
-    const encryptPassword = new EncryptPasswordService(password)
+    const encryptPassword = new EncryptPasswordService(content.password)
     const newPassword = encryptPassword.encrypt()
 
     if (newPassword.isError) {
@@ -44,7 +97,12 @@ export class UserService {
     }
 
     try {
-      await User.create({ id, name, email, password: newPassword.content })
+      await User.create({
+        id,
+        name: content.name,
+        email: content.email,
+        password: newPassword.content
+      })
       result.content = { message: "User create with success!" }
 
       return result
@@ -56,6 +114,7 @@ export class UserService {
   public async login(tokenService: TokenService): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
     const { error, isError, content } = await this._loginValidation()
+    const id = uuidv4()
 
     if (isError) {
       result.isError = isError
@@ -68,10 +127,27 @@ export class UserService {
       const refreshToken = tokenService.createToken(content.id, "3d")
       const refreshTokenExpiresDate = dayjs().add(3, "days").toDate()
 
+      const token = await Token.findOne({ where: { userToken: content.id } })
+
+      if (token !== null) {
+        token.userToken = content.id
+        token.token = refreshToken.content
+        token.dataValues.expireDate = refreshTokenExpiresDate
+        await token.save()
+
+        result.content = {
+          accessToken,
+          refreshToken,
+          message: "User logged with success!"
+        }
+        return result
+      }
+
       await Token.create({
+        id,
         userToken: content.id,
-        token: refreshToken,
-        expireDat: refreshTokenExpiresDate
+        token: refreshToken.content,
+        expireDate: refreshTokenExpiresDate
       })
 
       result.content = {
@@ -79,6 +155,36 @@ export class UserService {
         refreshToken,
         message: "User logged with success!"
       }
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
+
+  public async deleteUser(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: {} }
+    const id = this._req.user?.id
+
+    try {
+      const user = await User.findOne({ where: { id } })
+      await user?.destroy()
+
+      result.content = { message: "User deleted." }
+      return result
+    } catch (error) {
+      return handleCatchErrors(error)
+    }
+  }
+
+  private async _updateInfosValidation(): Promise<IResult> {
+    const result: IResult = { error: [""], isError: false, content: "" }
+
+    try {
+      await updateInfosAuthenticateSchema.validate(this._req.body, {
+        abortEarly: false
+      })
+
+      result.content = this._req.body
       return result
     } catch (error) {
       return handleCatchErrors(error)
@@ -93,18 +199,10 @@ export class UserService {
         abortEarly: false
       })
 
+      result.content = this._req.body
       return result
     } catch (err) {
-      const errors: string[] = []
-
-      ;(err as yup.ValidationError).errors.forEach(error => {
-        errors.push(error)
-      })
-
-      result.isError = true
-      result.error = errors
-
-      return result
+      return handleYupErrors(err as yup.ValidationError)
     }
   }
 
@@ -135,16 +233,7 @@ export class UserService {
       result.content = { id: user.id }
       return result
     } catch (err) {
-      const errors: string[] = []
-
-      ;(err as yup.ValidationError).errors.forEach(error => {
-        errors.push(error)
-      })
-
-      result.isError = true
-      result.error = errors
-
-      return result
+      return handleYupErrors(err as yup.ValidationError)
     }
   }
 }
