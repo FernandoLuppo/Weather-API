@@ -36,7 +36,6 @@ export class TokenService {
   public validateToken(token: string, req: Request): IResult {
     const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
-    console.log(token)
 
     if (token !== "" && TOKEN_SECRET !== undefined) {
       const decodedToken = verify(token, TOKEN_SECRET) as {
