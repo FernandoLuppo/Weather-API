@@ -1,7 +1,5 @@
 import type { Response } from "express"
-import type { UserService } from "../services/user/UserService"
-import type { IResult } from "../types"
-import type { TokenService } from "../services/token/TokenService"
+import type { UserService, TokenService } from "../services"
 
 export class UserController {
   constructor(
@@ -9,34 +7,37 @@ export class UserController {
     private readonly _userService: UserService
   ) {}
 
-  public async createUser(): Promise<Response<any, Record<string, any>>> {
-    const result: IResult = { error: [""], isError: false, content: {} }
-    const { content, error, isError } = await this._userService.register()
+  public async getInfos(): Promise<Response<any, Record<string, any>>> {
+    const { content, error, isError } = await this._userService.getInfos()
 
-    if (isError) {
-      result.isError = true
-      result.error = error
-      return this._res.status(401).send(result)
-    }
-    result.content = content
+    if (isError) return this._res.status(401).send({ content, error, isError })
 
-    return this._res.status(201).send(result)
+    return this._res.status(201).send({ content, error, isError })
   }
 
-  public async getUser(
+  public async updateInfos(): Promise<Response<any, Record<string, any>>> {
+    const { content, error, isError } = await this._userService.updateInfos()
+
+    if (isError) return this._res.status(401).send({ content, error, isError })
+
+    return this._res.status(201).send({ content, error, isError })
+  }
+
+  public async register(): Promise<Response<any, Record<string, any>>> {
+    const { content, error, isError } = await this._userService.register()
+
+    if (isError) return this._res.status(401).send({ content, error, isError })
+
+    return this._res.status(201).send({ content, error, isError })
+  }
+
+  public async login(
     tokenService: TokenService
   ): Promise<Response<any, Record<string, any>>> {
-    const result: IResult = { error: [""], isError: false, content: {} }
-
     const { content, error, isError } =
       await this._userService.login(tokenService)
 
-    if (isError) {
-      result.error = error
-      result.isError = isError
-      return this._res.status(401).send(result)
-    }
-    result.content = "User Logged with success"
+    if (isError) return this._res.status(401).send({ content, error, isError })
 
     return this._res
       .status(200)
@@ -50,6 +51,14 @@ export class UserController {
         httpOnly: false,
         sameSite: "lax"
       })
-      .send(result)
+      .send({ content, error, isError })
+  }
+
+  public async deleteUser(): Promise<Response<any, Record<string, any>>> {
+    const { content, error, isError } = await this._userService.deleteUser()
+
+    if (isError) return this._res.status(401).send({ content, error, isError })
+
+    return this._res.status(201).send({ content, error, isError })
   }
 }
