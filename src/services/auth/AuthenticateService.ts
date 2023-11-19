@@ -16,8 +16,6 @@ export class AuthenticateService {
     const userId = this._req.user?.id
     const tokenId = uuidv4()
 
-    console.log("tokenId: ", tokenId)
-
     try {
       const user = await User.findOne({ where: { userId } })
       if (user === null) {
