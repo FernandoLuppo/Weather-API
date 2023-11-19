@@ -15,6 +15,7 @@
     "@typescript-eslint/no-misused-promises": "off",
     "@typescript-eslint/dot-notation": "off",
     "@typescript-eslint/no-confusing-void-expression": "off",
-    "no-new": "off"
+    "no-new": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off"
   }
 }
