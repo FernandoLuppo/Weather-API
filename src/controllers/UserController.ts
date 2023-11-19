@@ -1,5 +1,6 @@
 import type { Response } from "express"
-import type { UserService, TokenService } from "../services"
+import type { UserService } from "../services"
+import type { CreateAuthTokenService } from "../services/token/CreateAuthTokenService"
 
 export class UserController {
   constructor(
@@ -32,10 +33,11 @@ export class UserController {
   }
 
   public async login(
-    tokenService: TokenService
+    createAuthTokenService: CreateAuthTokenService
   ): Promise<Response<any, Record<string, any>>> {
-    const { content, error, isError } =
-      await this._userService.login(tokenService)
+    const { content, error, isError } = await this._userService.login(
+      createAuthTokenService
+    )
 
     if (isError) return this._res.status(401).send({ content, error, isError })
 

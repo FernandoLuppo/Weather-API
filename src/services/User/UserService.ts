@@ -7,12 +7,10 @@ import {
   updateInfosAuthenticateSchema
 } from "../../middleware"
 import { User } from "../../database/models/User"
-import { Token } from "../../database/models/Token"
 import { v4 as uuidv4 } from "uuid"
 import { handleCatchErrors, handleYupErrors } from "../../utils"
-import type { TokenService } from "../"
-import dayjs from "dayjs"
 import { EncryptPasswordService } from "../"
+import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 
 export class UserService {
   public constructor(private readonly _req: Request) {}
@@ -111,9 +109,11 @@ export class UserService {
     }
   }
 
-  public async login(tokenService: TokenService): Promise<IResult> {
-    const result: IResult = { error: [""], isError: false, content: {} }
-    const { error, isError, content } = await this._loginValidation()
+  public async login(
+    createAuthTokenService: CreateAuthTokenService
+  ): Promise<IResult> {
+    let result: IResult = { error: [""], isError: false, content: {} }
+    const { content, error, isError } = await this._loginValidation()
     const id = uuidv4()
 
     if (isError) {
@@ -123,38 +123,21 @@ export class UserService {
     }
 
     try {
-      const accessToken = tokenService.createToken(content.id, "60m")
-      const refreshToken = tokenService.createToken(content.id, "3d")
-      const refreshTokenExpiresDate = dayjs().add(3, "days").toDate()
+      const createAuthTokens = await createAuthTokenService.createAuthTokens({
+        tokenId: id,
+        userId: content.id,
+        accessTokenTime: "60m",
+        refreshTokenTime: "3d",
+        message: "User logged with success!"
+      })
 
-      const token = await Token.findOne({ where: { userToken: content.id } })
-
-      if (token !== null) {
-        token.userToken = content.id
-        token.token = refreshToken.content
-        token.dataValues.expireDate = refreshTokenExpiresDate
-        await token.save()
-
-        result.content = {
-          accessToken,
-          refreshToken,
-          message: "User logged with success!"
-        }
+      if (createAuthTokens.isError) {
+        result.isError = true
+        result.error = createAuthTokens.error
         return result
       }
 
-      await Token.create({
-        id,
-        userToken: content.id,
-        token: refreshToken.content,
-        expireDate: refreshTokenExpiresDate
-      })
-
-      result.content = {
-        accessToken,
-        refreshToken,
-        message: "User logged with success!"
-      }
+      result = createAuthTokens
       return result
     } catch (error) {
       return handleCatchErrors(error)

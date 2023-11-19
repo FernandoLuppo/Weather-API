@@ -1,7 +1,7 @@
 import { Router } from "express"
 import type { Request, Response } from "express"
 import { TokenAuthenticate, UserAuthenticate } from "../middleware"
-import { TokenService, UserService } from "../services"
+import { CreateAuthTokenService, UserService } from "../services"
 import { UserController } from "../controllers/UserController"
 
 const userRouter = Router()
@@ -43,10 +43,23 @@ userRouter.post(
   userAuthenticate.login,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    const tokenService = new TokenService()
-    return await new UserController(res, userService).login(tokenService)
+    const createAuthTokenService = new CreateAuthTokenService()
+    return await new UserController(res, userService).login(
+      createAuthTokenService
+    )
   }
 )
+
+userRouter.get("/logout", (req: Request, res: Response) => {
+  res.clearCookie("accessToken").clearCookie("refreshToken")
+  res
+    .status(200)
+    .send({
+      content: { message: "Exited with success" },
+      isError: false,
+      error: ""
+    })
+})
 
 userRouter.delete(
   "/delete",
