@@ -12,6 +12,13 @@ interface ICreateAuthTokens {
   message?: string
 }
 
+interface ICreateEmailTokens {
+  payload: number
+  subject: string
+  emailTokenTime: string
+  message?: string
+}
+
 export class CreateAuthTokenService extends TokenService {
   public async createAuthTokens({
     tokenId,
@@ -21,23 +28,30 @@ export class CreateAuthTokenService extends TokenService {
     message
   }: ICreateAuthTokens): Promise<IResult> {
     const result: IResult = { error: [], isError: false, content: {} }
-
-    const accessToken = this.createToken(userId, accessTokenTime)
-    const refreshToken = this.createToken(userId, refreshTokenTime)
+    const { content, error, isError } = this._validationCreateAuthTokens({
+      userId,
+      accessTokenTime,
+      refreshTokenTime
+    })
     const refreshTokenExpiresDate = dayjs().add(3, "days").toDate()
+
+    if (isError) {
+      return { content, error, isError }
+    }
 
     try {
       const token = await Token.findOne({ where: { userToken: userId } })
 
       if (token !== null) {
         token.userToken = userId
-        token.token = refreshToken.content
+        token.token = content.refreshToken
         token.dataValues.expireDate = refreshTokenExpiresDate
+        token.updatedAt = new Date()
         await token.save()
 
         result.content = {
-          accessToken,
-          refreshToken,
+          accessToken: content.accessToken,
+          refreshToken: content.refreshToken,
           message
         }
         return result
@@ -46,13 +60,13 @@ export class CreateAuthTokenService extends TokenService {
       await Token.create({
         id: tokenId,
         userToken: userId,
-        token: refreshToken.content,
+        token: content.refreshToken,
         expireDate: refreshTokenExpiresDate
       })
 
       result.content = {
-        accessToken,
-        refreshToken,
+        accessToken: content.accessToken,
+        refreshToken: content.refreshToken,
         message
       }
 
@@ -60,5 +74,54 @@ export class CreateAuthTokenService extends TokenService {
     } catch (error) {
       return handleCatchErrors(error)
     }
+  }
+
+  public async createEmailToken({
+    payload,
+    subject,
+    emailTokenTime,
+    message
+  }: ICreateEmailTokens): Promise<IResult> {
+    let result: IResult = { error: [], isError: false, content: {} }
+
+    const emailToken = this.createToken(payload, subject, emailTokenTime)
+
+    if (emailToken.isError) {
+      result = emailToken
+      return result
+    }
+
+    result.content = {
+      emailToken: emailToken.content,
+      message
+    }
+    return result
+  }
+
+  private _validationCreateAuthTokens({
+    userId,
+    accessTokenTime,
+    refreshTokenTime
+  }: ICreateAuthTokens): IResult {
+    let result: IResult = { error: [], isError: false, content: {} }
+
+    const accessToken = this.createToken("", userId, accessTokenTime)
+    const refreshToken = this.createToken("", userId, refreshTokenTime)
+
+    if (accessToken.isError) {
+      result = accessToken
+      return result
+    }
+
+    if (refreshToken.isError) {
+      result = refreshToken
+      return result
+    }
+
+    result.content = {
+      accessToken: accessToken.content,
+      refreshToken: refreshToken.content
+    }
+    return result
   }
 }
