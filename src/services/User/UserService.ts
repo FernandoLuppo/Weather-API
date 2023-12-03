@@ -17,7 +17,7 @@ export class UserService {
 
   public async getInfos(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
-    const id = this._req.user?.id
+    const id = this._req.user?.subject
 
     try {
       const user = await User.findOne({ where: { id } })
@@ -42,7 +42,7 @@ export class UserService {
   public async updateInfos(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
     const { content, error, isError } = await this._updateInfosValidation()
-    const id = this._req.user?.id
+    const id = this._req.user?.subject
 
     if (isError) {
       result.error = error
@@ -56,6 +56,7 @@ export class UserService {
         user.name = content.name
         user.email = content.email
         user.dataValues.profileImage = content.profileImage
+        user.updatedAt = new Date()
         await user.save()
 
         result.content = {
@@ -146,7 +147,7 @@ export class UserService {
 
   public async deleteUser(): Promise<IResult> {
     const result: IResult = { error: [""], isError: false, content: {} }
-    const id = this._req.user?.id
+    const id = this._req.user?.subject
 
     try {
       const user = await User.findOne({ where: { id } })
@@ -184,8 +185,8 @@ export class UserService {
 
       result.content = this._req.body
       return result
-    } catch (err) {
-      return handleYupErrors(err as yup.ValidationError)
+    } catch (error) {
+      return handleYupErrors(error as yup.ValidationError)
     }
   }
 
@@ -215,8 +216,8 @@ export class UserService {
 
       result.content = { id: user.id }
       return result
-    } catch (err) {
-      return handleYupErrors(err as yup.ValidationError)
+    } catch (error) {
+      return handleYupErrors(error as yup.ValidationError)
     }
   }
 }
