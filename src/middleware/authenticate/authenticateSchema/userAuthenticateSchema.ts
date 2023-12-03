@@ -17,7 +17,16 @@ export const registerAuthenticateSchema = yup.object().shape({
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
       "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and One Special Case Character"
+    ),
+  confirmPassword: yup
+    .string()
+    .required("Confirm Password field is required")
+    .trim()
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})/,
+      "Passwords don't match."
     )
+    .oneOf([yup.ref("password")], "Passwords must match")
 })
 
 export const loginAuthenticateSchema = yup.object().shape({

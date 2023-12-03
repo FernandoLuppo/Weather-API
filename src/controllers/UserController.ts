@@ -39,7 +39,7 @@ export class UserController {
       createAuthTokenService
     )
 
-    if (isError) return this._res.status(401).send({ content, error, isError })
+    if (isError) return this._res.status(401).send({ error, isError })
 
     return this._res
       .status(200)
@@ -53,7 +53,7 @@ export class UserController {
         httpOnly: false,
         sameSite: "lax"
       })
-      .send({ content, error, isError })
+      .send({ content: { message: "Logged with success!" }, error, isError })
   }
 
   public async deleteUser(): Promise<Response<any, Record<string, any>>> {

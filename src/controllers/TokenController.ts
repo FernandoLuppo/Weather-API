@@ -10,7 +10,7 @@ export class TokenController {
   ) {}
 
   public async authTokens(): Promise<Response<any, Record<string, any>>> {
-    const userId = this._req.user?.id as string
+    const userId = this._req.user?.subject as string
     const tokenId = uuidv4()
 
     const { content, error, isError } =
@@ -21,7 +21,7 @@ export class TokenController {
         refreshTokenTime: "3d"
       })
 
-    if (isError) return this._res.status(401).send({ content, error, isError })
+    if (isError) return this._res.status(401).send({ error, isError })
 
     return this._res
       .status(200)
@@ -35,6 +35,6 @@ export class TokenController {
         httpOnly: false,
         sameSite: "lax"
       })
-      .send({ content, error, isError })
+      .send({ content: { message: "Updated tokens." }, error, isError })
   }
 }

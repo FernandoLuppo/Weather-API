@@ -13,7 +13,7 @@ export class AuthenticateService {
 
   public async newAccessAndRefreshToken(): Promise<IResult> {
     let result: IResult = { error: [""], isError: false, content: {} }
-    const userId = this._req.user?.id
+    const userId = this._req.user?.subject
     const tokenId = uuidv4()
 
     try {
@@ -30,7 +30,7 @@ export class AuthenticateService {
           userId: user.id,
           accessTokenTime: "60m",
           refreshTokenTime: "3d",
-          message: "User logged with success!"
+          message: "Update tokens"
         })
 
       if (createAuthTokens.isError) {
