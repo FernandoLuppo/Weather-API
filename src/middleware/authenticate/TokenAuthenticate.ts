@@ -7,7 +7,7 @@ export class TokenAuthenticate {
     const tokenService = new TokenService()
 
     const { content, error, isError } = tokenService.validateToken(
-      accessToken.content,
+      accessToken,
       req
     )
 
@@ -24,7 +24,7 @@ export class TokenAuthenticate {
     const tokenService = new TokenService()
 
     const { content, error, isError } = tokenService.validateToken(
-      refreshToken.content,
+      refreshToken,
       req
     )
 
@@ -37,11 +37,12 @@ export class TokenAuthenticate {
   }
 
   public emailToken(req: Request, res: Response, next: NextFunction): void {
-    const { emailToken } = req.cookies
+    const { emailToken } = req.body
+
     const tokenService = new TokenService()
 
     const { content, error, isError } = tokenService.validateToken(
-      emailToken.content,
+      emailToken,
       req
     )
 
