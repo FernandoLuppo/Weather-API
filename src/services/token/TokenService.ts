@@ -7,15 +7,19 @@ declare global {
   namespace Express {
     interface Request {
       user?: {
-        id?: string
-        refreshTokenID?: string
+        subject: string
+        payload: any
       }
     }
   }
 }
 
 export class TokenService {
-  protected createToken(id: string, date: string): IResult {
+  protected createToken(
+    payload: any,
+    subject: string = "",
+    expiresIn: string
+  ): IResult {
     const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
 
@@ -25,16 +29,16 @@ export class TokenService {
       return result
     }
 
-    const token = sign({}, TOKEN_SECRET, {
-      subject: id,
-      expiresIn: date
+    const token = sign({ payload }, TOKEN_SECRET, {
+      subject,
+      expiresIn
     })
 
     result.content = token
     return result
   }
 
-  public validateToken(token: string, req: Request): IResult {
+  public validateToken(token: any, req: Request): IResult {
     const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
 
@@ -42,14 +46,17 @@ export class TokenService {
       if (token !== "" && TOKEN_SECRET !== undefined) {
         const decodedToken = verify(token, TOKEN_SECRET) as {
           sub?: string
+          payload?: any
         }
 
         if (decodedToken.sub !== undefined) {
           req.user = {
-            id: decodedToken.sub
+            subject: decodedToken.sub,
+            payload: decodedToken.payload
           }
         }
 
+        result.content = decodedToken.sub
         return result
       }
 
