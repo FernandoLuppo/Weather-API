@@ -171,7 +171,7 @@ export class UserService {
       result.content = this._req.body
       return result
     } catch (error) {
-      return handleCatchErrors(error)
+      return handleYupErrors(error as yup.ValidationError)
     }
   }
 
