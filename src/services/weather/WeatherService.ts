@@ -1,8 +1,8 @@
 import type { Request } from "express"
-import { weatherAuthenticateSchema } from "../../middleware"
 import type { IResult } from "../../types"
-import { handleCatchErrors, handleYupErrors } from "../../utils"
 import type * as yup from "yup"
+import { weatherAuthenticateSchema } from "../../middleware"
+import { handleCatchErrors, handleYupErrors } from "../../utils"
 import axios from "axios"
 
 interface IndependentUrl {

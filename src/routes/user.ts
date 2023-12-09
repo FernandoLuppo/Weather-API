@@ -1,11 +1,10 @@
-import { Router } from "express"
 import type { Request, Response } from "express"
+import { Router } from "express"
 import { TokenAuthenticate, UserAuthenticate } from "../middleware"
 import { CreateAuthTokenService, UserService } from "../services"
 import { UserController } from "../controllers/UserController"
 
 const userRouter = Router()
-
 const userAuthenticate = new UserAuthenticate()
 const tokenAuthenticate = new TokenAuthenticate()
 
@@ -52,13 +51,11 @@ userRouter.post(
 
 userRouter.get("/logout", (req: Request, res: Response) => {
   res.clearCookie("accessToken").clearCookie("refreshToken")
-  res
-    .status(200)
-    .send({
-      content: { message: "Exited with success" },
-      isError: false,
-      error: ""
-    })
+  res.status(200).send({
+    content: { message: "Exited with success" },
+    isError: false,
+    error: ""
+  })
 })
 
 userRouter.delete(

@@ -1,6 +1,7 @@
 import type { Request } from "express"
 import type * as yup from "yup"
 import type { IResult } from "../../types"
+import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 import {
   loginAuthenticateSchema,
   registerAuthenticateSchema,
@@ -10,7 +11,6 @@ import { User } from "../../database/models/User"
 import { v4 as uuidv4 } from "uuid"
 import { handleCatchErrors, handleYupErrors } from "../../utils"
 import { EncryptPasswordService } from "../"
-import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 
 export class UserService {
   public constructor(private readonly _req: Request) {}
