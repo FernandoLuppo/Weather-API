@@ -1,14 +1,14 @@
 import type { Request } from "express"
 import type { EmailService } from "../email/EmailService"
 import type { IResult } from "../../types"
+import type * as yup from "yup"
+import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 import {
   checkEmailAuthenticateSchema,
   newPasswordAuthenticateSchema
 } from "../../middleware"
 import { codeGenerator, handleCatchErrors, handleYupErrors } from "../../utils"
-import type * as yup from "yup"
 import { User } from "../../database/models/User"
-import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 
 export class RecoverPasswordService {
   constructor(private readonly _req: Request) {}

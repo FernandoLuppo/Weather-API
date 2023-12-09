@@ -1,11 +1,11 @@
+import type { NextFunction, Request, Response } from "express"
+import type * as yup from "yup"
+import { handleYupErrors } from "../../utils"
 import {
   loginAuthenticateSchema,
   registerAuthenticateSchema,
   updateInfosAuthenticateSchema
 } from "./authenticateSchema"
-import type { NextFunction, Request, Response } from "express"
-import type * as yup from "yup"
-import { handleYupErrors } from "../../utils"
 
 export class UserAuthenticate {
   public async register(
@@ -20,7 +20,7 @@ export class UserAuthenticate {
 
       next()
     } catch (err) {
-      res.status(401).send(handleYupErrors(err as yup.ValidationError ))
+      res.status(401).send(handleYupErrors(err as yup.ValidationError))
     }
   }
 
@@ -36,7 +36,7 @@ export class UserAuthenticate {
 
       next()
     } catch (err) {
-      res.status(401).send(handleYupErrors(err as yup.ValidationError ))
+      res.status(401).send(handleYupErrors(err as yup.ValidationError))
     }
   }
 
@@ -52,7 +52,7 @@ export class UserAuthenticate {
 
       next()
     } catch (err) {
-      res.status(401).send(handleYupErrors(err as yup.ValidationError ))
+      res.status(401).send(handleYupErrors(err as yup.ValidationError))
     }
   }
 }

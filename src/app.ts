@@ -1,7 +1,12 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
-import { userRouter, tokenRouter, recoverPasswordRouter } from "./routes"
+import {
+  userRouter,
+  tokenRouter,
+  recoverPasswordRouter,
+  weatherRouter
+} from "./routes"
 
 import * as dotenv from "dotenv"
 dotenv.config()
@@ -15,5 +20,6 @@ app.use(cookieParser())
 app.use("/user", userRouter)
 app.use("/token", tokenRouter)
 app.use("/recover-password", recoverPasswordRouter)
+app.use("/weather", weatherRouter)
 
 export { app }

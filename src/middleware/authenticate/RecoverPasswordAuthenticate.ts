@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from "express"
+import type * as yup from "yup"
 import {
   checkEmailAuthenticateSchema,
   newPasswordAuthenticateSchema
 } from "./authenticateSchema"
 import { handleYupErrors } from "../../utils"
-import type * as yup from "yup"
 
 export class RecoverPasswordAuthenticate {
   public async checkEmail(

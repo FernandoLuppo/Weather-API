@@ -1,8 +1,8 @@
 import type { Request } from "express"
-import { handleCatchErrors } from "../../utils"
-import { User } from "../../database/models/User"
 import type { IResult } from "../../types"
 import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
+import { handleCatchErrors } from "../../utils"
+import { User } from "../../database/models/User"
 import { v4 as uuidv4 } from "uuid"
 
 export class AuthenticateService {
