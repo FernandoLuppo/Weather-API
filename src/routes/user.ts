@@ -10,21 +10,21 @@ const tokenAuthenticate = new TokenAuthenticate()
 
 userRouter.get(
   "/get-infos",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).getInfos()
+    return await new UserController(req, res, userService).getInfos()
   }
 )
 
 //  Ver a diferenca de patch e put
 userRouter.patch(
   "/update-infos",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   userAuthenticate.updateInfos,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).updateInfos()
+    return await new UserController(req, res, userService).updateInfos()
   }
 )
 
@@ -33,7 +33,7 @@ userRouter.post(
   userAuthenticate.register,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).register()
+    return await new UserController(req, res, userService).register()
   }
 )
 
@@ -43,7 +43,7 @@ userRouter.post(
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
     const createAuthTokenService = new CreateAuthTokenService()
-    return await new UserController(res, userService).login(
+    return await new UserController(req, res, userService).login(
       createAuthTokenService
     )
   }
@@ -60,10 +60,10 @@ userRouter.get("/logout", (req: Request, res: Response) => {
 
 userRouter.delete(
   "/delete",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).deleteUser()
+    return await new UserController(req, res, userService).deleteUser()
   }
 )
 

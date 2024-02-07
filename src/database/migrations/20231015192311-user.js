@@ -24,10 +24,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      profile_image: {
-        type: Sequelize.STRING,
-        defaultValue: "assets/icons/user-icon.svg"
-      },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false

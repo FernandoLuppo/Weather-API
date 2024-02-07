@@ -2,7 +2,11 @@ import type { Request } from "express"
 import type { IResult } from "../../types"
 import type * as yup from "yup"
 import { weatherAuthenticateSchema } from "../../middleware"
-import { handleCatchErrors, handleYupErrors } from "../../utils"
+import {
+  handleCatchErrors,
+  handleYupErrors,
+  selectUnsplashImage
+} from "../../utils"
 import axios from "axios"
 
 interface IndependentUrl {
@@ -38,18 +42,18 @@ export class WeatherService {
       const unsplashResult = await axios.get(
         mountingIndependentUrl.content.unsplashUrl
       )
+      const { imgFull, imgSmall } = selectUnsplashImage(
+        unsplashResult.data.results
+      )
 
       const mountingDependentsUrl = this._mountingDependentsUrl({
         country: weatherResult.data.sys.country
       })
-      const flagsResult = await axios.post(
-        mountingDependentsUrl.content.flagUrl
-      )
 
       result.content = {
-        weather: weatherResult.data,
-        unsplash: unsplashResult.data,
-        flags: flagsResult.data
+        weatherAPI: weatherResult.data,
+        unsplash: { imgFull, imgSmall },
+        flags: mountingDependentsUrl.content.flagUrl
       }
       return result
     } catch (error) {

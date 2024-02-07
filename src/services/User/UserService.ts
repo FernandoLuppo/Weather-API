@@ -9,7 +9,11 @@ import {
 } from "../../middleware"
 import { User } from "../../database/models/User"
 import { v4 as uuidv4 } from "uuid"
-import { handleCatchErrors, handleYupErrors } from "../../utils"
+import {
+  handleCatchErrors,
+  handleRegisterCatchErrors,
+  handleYupErrors
+} from "../../utils"
 import { EncryptPasswordService } from "../"
 
 export class UserService {
@@ -24,10 +28,11 @@ export class UserService {
 
       if (user !== null) {
         result.content = {
+          id: user?.id,
           name: user?.name,
-          email: user?.email,
-          userProfile: user?.dataValues.profileImage
+          email: user?.email
         }
+
         return result
       }
 
@@ -55,14 +60,12 @@ export class UserService {
       if (user !== null) {
         user.name = content.name
         user.email = content.email
-        user.dataValues.profileImage = content.profileImage
         user.updatedAt = new Date()
         await user.save()
 
         result.content = {
           name: user?.name,
-          email: user?.email,
-          profileImage: user.dataValues.profileImage
+          email: user?.email
         }
         return result
       }
@@ -106,14 +109,14 @@ export class UserService {
 
       return result
     } catch (error) {
-      return handleCatchErrors(error)
+      return handleRegisterCatchErrors(error)
     }
   }
 
   public async login(
     createAuthTokenService: CreateAuthTokenService
   ): Promise<IResult> {
-    let result: IResult = { error: [""], isError: false, content: {} }
+    const result: IResult = { error: [""], isError: false, content: {} }
     const { content, error, isError } = await this._loginValidation()
     const id = uuidv4()
 
@@ -138,7 +141,14 @@ export class UserService {
         return result
       }
 
-      result = createAuthTokens
+      const userInfos = {
+        userId: content.id,
+        userName: content.name,
+        userEmail: content.email
+      }
+
+      result.content = { ...createAuthTokens.content, userInfos }
+
       return result
     } catch (error) {
       return handleCatchErrors(error)
@@ -214,7 +224,7 @@ export class UserService {
         return result
       }
 
-      result.content = { id: user.id }
+      result.content = { id: user.id, name: user.name, email: user.email }
       return result
     } catch (error) {
       return handleYupErrors(error as yup.ValidationError)

@@ -10,7 +10,7 @@ const tokenAuthenticate = new TokenAuthenticate()
 
 weatherRouter.post(
   "/location",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   weatherAuthenticate.location,
   async (req: Request, res: Response) => {
     const weatherService = new WeatherService(req)

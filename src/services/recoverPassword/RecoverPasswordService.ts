@@ -83,8 +83,7 @@ export class RecoverPasswordService {
       return result
     }
 
-    const user = await User.findOne({ where: { subject } })
-
+    const user = await User.findOne({ where: { email: subject } })
     try {
       if (!user) {
         result.isError = true
@@ -124,7 +123,7 @@ export class RecoverPasswordService {
 
     const { code } = this._req.body
 
-    if (code !== payload) {
+    if (Number(code) !== payload) {
       result.isError = true
       result.error = ["Code is incorrect."]
       return result

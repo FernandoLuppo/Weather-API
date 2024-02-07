@@ -42,26 +42,31 @@ export class TokenService {
     const result: IResult = { error: [], isError: false, content: {} }
     const { TOKEN_SECRET } = process.env
 
-    try {
-      if (token !== "" && TOKEN_SECRET !== undefined) {
-        const decodedToken = verify(token, TOKEN_SECRET) as {
-          sub?: string
-          payload?: any
-        }
-
-        if (decodedToken.sub !== undefined) {
-          req.user = {
-            subject: decodedToken.sub,
-            payload: decodedToken.payload
-          }
-        }
-
-        result.content = decodedToken.sub
-        return result
-      }
-
+    if (
+      token === "" &&
+      token === undefined &&
+      token === null &&
+      TOKEN_SECRET === undefined
+    ) {
       result.isError = true
       result.error = ["Invalid token."]
+      return result
+    }
+
+    try {
+      const decodedToken = verify(token, TOKEN_SECRET as string) as {
+        sub?: string
+        payload?: any
+      }
+
+      if (decodedToken.sub !== undefined) {
+        req.user = {
+          subject: decodedToken.sub,
+          payload: decodedToken.payload
+        }
+      }
+
+      result.content = decodedToken.sub
       return result
     } catch (error) {
       return handleCatchErrors(error)

@@ -28,6 +28,7 @@ export class CreateAuthTokenService extends TokenService {
     message
   }: ICreateAuthTokens): Promise<IResult> {
     const result: IResult = { error: [], isError: false, content: {} }
+
     const { content, error, isError } = this._validationCreateAuthTokens({
       userId,
       accessTokenTime,
