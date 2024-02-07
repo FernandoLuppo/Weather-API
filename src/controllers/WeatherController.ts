@@ -15,6 +15,21 @@ export class WeatherController {
 
     if (isError) return this._res.status(400).send({ content, error, isError })
 
+    if (this._req.result?.hasNewCookies)
+      return this._res
+        .status(200)
+        .cookie("accessToken", this._req?.result?.content.accessToken, {
+          maxAge: 3.6e6,
+          httpOnly: false,
+          sameSite: "lax"
+        })
+        .cookie("refreshToken", this._req?.result?.content.refreshToken, {
+          maxAge: 2.592e8,
+          httpOnly: false,
+          sameSite: "lax"
+        })
+        .send({ content, error, isError })
+
     return this._res.status(200).send({ content, error, isError })
   }
 }
