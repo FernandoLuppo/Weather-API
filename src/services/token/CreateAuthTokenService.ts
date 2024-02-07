@@ -1,8 +1,8 @@
+import type { IResult } from "../../types"
 import dayjs from "dayjs"
 import { Token } from "../../database/models/Token"
 import { TokenService } from "./TokenService"
 import { handleCatchErrors } from "../../utils"
-import type { IResult } from "../../types"
 
 interface ICreateAuthTokens {
   tokenId?: string
@@ -28,6 +28,7 @@ export class CreateAuthTokenService extends TokenService {
     message
   }: ICreateAuthTokens): Promise<IResult> {
     const result: IResult = { error: [], isError: false, content: {} }
+
     const { content, error, isError } = this._validationCreateAuthTokens({
       userId,
       accessTokenTime,

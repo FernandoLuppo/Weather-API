@@ -11,6 +11,15 @@ export const handleCatchErrors = (error: unknown): IResult => {
   return result
 }
 
+export const handleRegisterCatchErrors = (error: any): IResult => {
+  const result: IResult = { error: [""], isError: false, content: {} }
+  console.log("Has a error: ", error)
+  result.error = [error.errors[0].message]
+  result.isError = true
+
+  return result
+}
+
 export const handleYupErrors = (item: yup.ValidationError): IResult => {
   const result: IResult = { error: [""], isError: false, content: {} }
   console.log("Yup Error: ", item.errors)

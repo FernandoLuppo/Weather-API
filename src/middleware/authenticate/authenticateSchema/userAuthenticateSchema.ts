@@ -47,8 +47,7 @@ export const loginAuthenticateSchema = yup.object().shape({
 
 export const updateInfosAuthenticateSchema = yup.object().shape({
   name: yup.string().min(3, "Name field needs more than 3 characters."),
-  email: yup.string().trim().email("Email field must contain a valid email."),
-  profileImage: yup.string().trim()
+  email: yup.string().trim().email("Email field must contain a valid email.")
 })
 
 export const recoverPasswordAuthenticateSchema = yup.object().shape({

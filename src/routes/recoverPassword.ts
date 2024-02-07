@@ -10,9 +10,7 @@ import {
 
 const recoverPasswordRouter = Router()
 const recoverPasswordAuthenticate = new RecoverPasswordAuthenticate()
-
 const tokenAuthenticate = new TokenAuthenticate()
-
 const createAuthTokenService = new CreateAuthTokenService()
 const emailService = new EmailService()
 

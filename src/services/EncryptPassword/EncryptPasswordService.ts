@@ -1,5 +1,5 @@
-import bcryptjs from "bcrypt"
 import type { IResult } from "../../types"
+import bcryptjs from "bcrypt"
 import { handleCatchErrors } from "../../utils"
 
 export class EncryptPasswordService {

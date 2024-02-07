@@ -1,14 +1,14 @@
 import type { Request } from "express"
 import type { EmailService } from "../email/EmailService"
 import type { IResult } from "../../types"
+import type * as yup from "yup"
+import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 import {
   checkEmailAuthenticateSchema,
   newPasswordAuthenticateSchema
 } from "../../middleware"
 import { codeGenerator, handleCatchErrors, handleYupErrors } from "../../utils"
-import type * as yup from "yup"
 import { User } from "../../database/models/User"
-import type { CreateAuthTokenService } from "../token/CreateAuthTokenService"
 
 export class RecoverPasswordService {
   constructor(private readonly _req: Request) {}
@@ -83,8 +83,7 @@ export class RecoverPasswordService {
       return result
     }
 
-    const user = await User.findOne({ where: { subject } })
-
+    const user = await User.findOne({ where: { email: subject } })
     try {
       if (!user) {
         result.isError = true
@@ -124,7 +123,7 @@ export class RecoverPasswordService {
 
     const { code } = this._req.body
 
-    if (code !== payload) {
+    if (Number(code) !== payload) {
       result.isError = true
       result.error = ["Code is incorrect."]
       return result

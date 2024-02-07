@@ -1,31 +1,30 @@
-import { Router } from "express"
 import type { Request, Response } from "express"
+import { Router } from "express"
 import { TokenAuthenticate, UserAuthenticate } from "../middleware"
 import { CreateAuthTokenService, UserService } from "../services"
 import { UserController } from "../controllers/UserController"
 
 const userRouter = Router()
-
 const userAuthenticate = new UserAuthenticate()
 const tokenAuthenticate = new TokenAuthenticate()
 
 userRouter.get(
   "/get-infos",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).getInfos()
+    return await new UserController(req, res, userService).getInfos()
   }
 )
 
 //  Ver a diferenca de patch e put
 userRouter.patch(
   "/update-infos",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   userAuthenticate.updateInfos,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).updateInfos()
+    return await new UserController(req, res, userService).updateInfos()
   }
 )
 
@@ -34,7 +33,7 @@ userRouter.post(
   userAuthenticate.register,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).register()
+    return await new UserController(req, res, userService).register()
   }
 )
 
@@ -44,7 +43,7 @@ userRouter.post(
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
     const createAuthTokenService = new CreateAuthTokenService()
-    return await new UserController(res, userService).login(
+    return await new UserController(req, res, userService).login(
       createAuthTokenService
     )
   }
@@ -52,21 +51,19 @@ userRouter.post(
 
 userRouter.get("/logout", (req: Request, res: Response) => {
   res.clearCookie("accessToken").clearCookie("refreshToken")
-  res
-    .status(200)
-    .send({
-      content: { message: "Exited with success" },
-      isError: false,
-      error: ""
-    })
+  res.status(200).send({
+    content: { message: "Exited with success" },
+    isError: false,
+    error: ""
+  })
 })
 
 userRouter.delete(
   "/delete",
-  tokenAuthenticate.accessToken,
+  tokenAuthenticate.validate,
   async (req: Request, res: Response) => {
     const userService = new UserService(req)
-    return await new UserController(res, userService).deleteUser()
+    return await new UserController(req, res, userService).deleteUser()
   }
 )
 

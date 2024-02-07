@@ -25,16 +25,15 @@ User.init(
     },
     email: {
       type: sequelize.STRING,
-      unique: true,
+      unique: {
+        name: "unique_email",
+        msg: "This e-mail is already in use"
+      },
       allowNull: false
     },
     password: {
       type: sequelize.STRING,
       allowNull: false
-    },
-    profileImage: {
-      type: sequelize.STRING,
-      defaultValue: "assets/icons/user-icon.svg"
     },
     createdAt: {
       type: sequelize.DATE,
