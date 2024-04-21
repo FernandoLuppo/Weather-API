@@ -17,12 +17,12 @@ userRouter.get(
   }
 )
 
-//  Ver a diferenca de patch e put
 userRouter.patch(
   "/update-infos",
   tokenAuthenticate.validate,
   userAuthenticate.updateInfos,
   async (req: Request, res: Response) => {
+    console.log(req.body)
     const userService = new UserService(req)
     return await new UserController(req, res, userService).updateInfos()
   }

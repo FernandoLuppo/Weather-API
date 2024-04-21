@@ -70,8 +70,6 @@ export class UserController {
       createAuthTokenService
     )
 
-    console.log(content)
-
     if (isError) this._res.status(401).send({ error, isError })
     this._res
       .status(200)

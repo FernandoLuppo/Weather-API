@@ -24,8 +24,11 @@ export class TokenAuthenticate {
       isError: false,
       hasNewCookies: false
     }
-    const { accessToken, refreshToken } = req.cookies
+
+    const { accessToken, refreshToken } =
+      JSON.parse(req.headers.authorization as string) || req.cookies
     const tokenService = new TokenService()
+    console.log(req.body)
 
     const accessTokenValidate = tokenService.validateToken(accessToken, req)
     console.log(accessTokenValidate)

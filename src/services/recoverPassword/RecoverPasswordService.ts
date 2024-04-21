@@ -9,6 +9,7 @@ import {
 } from "../../middleware"
 import { codeGenerator, handleCatchErrors, handleYupErrors } from "../../utils"
 import { User } from "../../database/models/User"
+import { EncryptPasswordService } from "../encryptPassword/EncryptPasswordService"
 
 export class RecoverPasswordService {
   constructor(private readonly _req: Request) {}
@@ -78,8 +79,16 @@ export class RecoverPasswordService {
 
     const validateNewPassword = await this._validateNewPassword()
 
+    const encryptPassword = new EncryptPasswordService(password)
+    const newPassword = encryptPassword.encrypt()
+
     if (validateNewPassword.isError) {
       result = validateNewPassword
+      return result
+    }
+
+    if (newPassword.isError) {
+      result = newPassword
       return result
     }
 
@@ -91,7 +100,7 @@ export class RecoverPasswordService {
         return result
       }
 
-      user.password = password
+      user.password = newPassword.content
       await user.save()
 
       result.content = { message: "Update user password." }

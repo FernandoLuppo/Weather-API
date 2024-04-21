@@ -13,6 +13,7 @@ export class UserAuthenticate {
     res: Response,
     next: NextFunction
   ): Promise<void> {
+    console.log(req.body)
     try {
       await registerAuthenticateSchema.validate(req.body, {
         abortEarly: false
